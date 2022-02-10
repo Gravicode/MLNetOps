@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Blazored.Toast
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -15,3 +16,9 @@
         </article>
     </main>
 </div>
+<BlazoredToasts Position="Blazored.Toast.Configuration.ToastPosition.BottomRight"
+                Timeout="10"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />

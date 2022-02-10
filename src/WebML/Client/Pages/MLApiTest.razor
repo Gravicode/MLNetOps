@@ -1,0 +1,79 @@
+﻿@using Newtonsoft.Json
+@using System.Text
+@using System.Diagnostics
+@using WebML.Shared
+@using static System.Net.WebRequestMethods
+@page "/test-api"
+@inject HttpClient Http
+@inject IToastService toastService
+
+<div class="fw-table w-75">
+    <div class="row fw-tableHeader mx-1">
+        <h5 class="pt-1 mb-0">Test ML API (MPG Prediction)</h5>
+        <div class="fw-table-header-actions">
+        </div>
+    </div>
+    <div class="row mb-4 mx-0">
+        <div class="col-lg-12 mt-4">
+            <div class="form-group">
+                <label for="fullname"><b>Nama Mobil</b></label>
+                <input @bind="DataInput.Car_name" type="text" class="form-control" id="txtNama" placeholder="chevrolet chevelle malibu">
+            </div>
+            <div class="form-group">
+                <label for="Akselerasi"><b>Akselerasi</b></label>
+                <input @bind="DataInput.Acceleration" type="text" class="form-control" id="Akselerasi" placeholder="12">
+            </div>
+            <div class="form-group">
+                <label for="Silinder"><b>Silinder</b></label>
+                <input @bind="DataInput.Cylinders" type="text" class="form-control" id="Silinder" placeholder="8">
+            </div>
+            <div class="form-group">
+                <label for="Displacement"><b>Displacement</b></label>
+                <input @bind="DataInput.Displacement" type="text" class="form-control" id="Displacement" placeholder="307">
+            </div>
+            <div class="form-group">
+                <label for="Horsepower"><b>Horsepower</b></label>
+                <input @bind="DataInput.Horsepower" type="text" class="form-control" id="Horsepower" placeholder="130">
+            </div>
+            <div class="form-group">
+                <label for="Tahun"><b>Model Tahun</b></label>
+                <input @bind="DataInput.Model_year" type="text" class="form-control" id="Tahun" placeholder="70">
+            </div>
+            <div class="form-group">
+                <label for="Origin"><b>Origin</b></label>
+                <input @bind="DataInput.Origin" type="text" class="form-control" id="Origin" placeholder="1">
+            </div>
+            <div class="form-group">
+                <label for="Berat"><b>Berat</b></label>
+                <input @bind="DataInput.Weight" type="text" class="form-control" id="Berat" placeholder="3504">
+            </div>
+           
+
+            <button @onclick="Process" class="btn btn-primary btn-block btn-lg">Proses</button>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    MPG.ModelInput DataInput;
+
+    async Task Process()
+    {
+        var json = JsonConvert.SerializeObject(DataInput);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var res = await Http.PostAsync("/predict", content);
+        if (res.IsSuccessStatusCode)
+        {
+            var outputJson = await res.Content.ReadAsStringAsync();
+            var output = JsonConvert.DeserializeObject<MPG.ModelOutput>(outputJson);
+            Debug.WriteLine("score:"+output.Score);
+            toastService.ShowInfo("Score :"+output.Score);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        DataInput = new MPG.ModelInput();
+    }
+}
